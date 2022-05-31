@@ -2,6 +2,26 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
+
+
+mongoose.connect('mongodb://localhost:27017/requestbin');
+
+const requestSchema = new mongoose.Schema({
+  headers: { type: Map, of: String },
+  body: String
+})
+
+const Request = mongoose.model('Request', requestSchema)
+
+requestSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
 
 function headersParser(req) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
@@ -10,6 +30,9 @@ function headersParser(req) {
   const accept = req.header('Accept');
   const body = req.body;
   return {contentType, method, accept, ip, body};
+}
+function binID() {
+  return crypto.randomBytes(8).toString('hex');
 }
 
 app.use(express.json());
@@ -20,17 +43,21 @@ morgan.token('headers', headersParser);
 app.use(morgan(' :headers'));
 
 
-app.all('/request', (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
+app.all('/request', async (req, res) => {
+ const headers = req.headers;
+ const body = req.body;
+ 
+ const newRequest = new Request({
+   headers: headers,
+   body: JSON.stringify(body)
+ })
+ 
+ const mongoResp = await newRequest.save()
 
-  // console.log('headers:', req.headers)
-  // console.log('method:', req.method)
-  // console.log('content-type:', req.header('content-type'))
-  // console.log('Accept:', req.header('Accept'))
-  // console.log('Sender IP:', ip)
-  // console.log('Body', req.body)
+ let id = mongoResp._id.toString()
 
 
+ res.json(mongoResp)
 })
 
 app.get('/', function (req, res) {
