@@ -1,15 +1,59 @@
 import pg from "pg";
 const { Client } = pg;
-import pgtools from "pgtools";
 import crypto from "crypto";
+const dbName = "requestbin";
 
 const dbInfo = {
   user: "team1",
   host: "localhost",
-  database: "requestbin",
+  database: dbName,
   password: "1234",
   port: 5432,
 };
+
+(async function initializeDatabase() {
+  const postgresClient = new Client({ ...dbInfo, database: "postgres" });
+  const requestBinClient = new Client(dbInfo);
+
+  try {
+    await postgresClient.connect();
+    // create requestbin database if not exists
+    createDatabaseAndTables();
+  } catch {}
+
+  async function createDatabaseAndTables() {
+    const createBinTable = {
+      text: `CREATE TABLE IF NOT EXISTS bins (
+    id SERIAL PRIMARY KEY,
+    url VARCHAR UNIQUE NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
+  );`,
+    };
+
+    const createRequestTable = {
+      text: `CREATE TABLE IF NOT EXISTS requests (
+    id SERIAL PRIMARY KEY,
+    bin_url VARCHAR REFERENCES bins (url) NOT NULL,
+    accept VARCHAR NOT NULL,
+    http_method VARCHAR NOT NULL,
+    sender_ip_address VARCHAR NOT NULL,
+    request_body_id VARCHAR NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
+  )`,
+    };
+    const createDatabase = `CREATE DATABASE ${dbName}`;
+    try {
+      await postgresClient.query(createDatabase);
+      await requestBinClient.connect();
+      await requestBinClient.query(createBinTable);
+      await requestBinClient.query(createRequestTable);
+    } catch {
+    } finally {
+      postgresClient.end();
+      requestBinClient.end();
+    }
+  }
+})();
 
 function binID() {
   return crypto.randomBytes(8).toString("hex");
@@ -26,7 +70,8 @@ async function queryHelper(query) {
 async function createUserBin() {
   const id = binID();
   const insertBin = {
-    text: `INSERT INTO bins (${client.escapeIdentifier("url")}) VALUES ($1);`,
+    text: `INSERT INTO bins ("url")
+    VALUES ($1);`,
     values: [id],
   };
   await queryHelper(insertBin);
@@ -39,7 +84,7 @@ async function isValidBin(binID) {
     values: [binID],
   };
   const response = await queryHelper(checkID);
-  console.log(response.rows.length)
+  console.log(response.rows.length);
   return response.rows.length === 1;
 }
 
@@ -80,53 +125,9 @@ async function retrieveBinRequests(binID) {
     values: [binID],
   };
   const response = await queryHelper(selectRequests);
-  console.log(response.rows)
+  console.log(response.rows);
   return response;
 }
-
-const client = new Client(dbInfo);
-
-await client.connect((err) => {
-  if (err) {
-    // create requestbin database if not exists
-    if (/database/.test(err.message)) {
-      const config = { ...dbInfo };
-      delete config.database;
-      pgtools.createdb(config, "requestbin", function (err, res) {
-        if (err) {
-          console.error(err.type);
-        }
-        // retry connection to requestbin database
-        client.connect((err, res) => {
-          client.end();
-        });
-      });
-    }
-  }
-});
-
-const createBinTable = {
-  text: `CREATE TABLE IF NOT EXISTS bins (
-    id SERIAL PRIMARY KEY,
-    url VARCHAR UNIQUE NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
-  );`,
-};
-
-const createRequestTable = {
-  text: `CREATE TABLE IF NOT EXISTS requests (
-    id SERIAL PRIMARY KEY,
-    bin_url VARCHAR REFERENCES bins (url) NOT NULL,
-    accept VARCHAR NOT NULL,
-    http_method VARCHAR NOT NULL,
-    sender_ip_address VARCHAR NOT NULL,
-    request_body_id VARCHAR NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
-  )`,
-};
-
-await queryHelper(createBinTable);
-await queryHelper(createRequestTable);
 
 // client.query(createBinTable, (err, res) => {
 //   console.log(err, res);

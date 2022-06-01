@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+/*
+const ids =  [
+    '4ed3ede8844f0f351100000c',
+    '4ed3f117a844e0471100000d', 
+    '4ed3f18132f50c491100000e',
+];
+Using Mongoose with callback:
+
+Model.find().where('_id').in(ids).exec((err, records) => {}
+
+*/
+
 mongoose.connect("mongodb://localhost:27017/requestbin");
 
 const requestSchema = new mongoose.Schema({
