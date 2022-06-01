@@ -2,36 +2,14 @@ import express from "express";
 const app = express();
 import morgan from "morgan";
 import crypto from "crypto";
-import mongoose from "mongoose";
+import { saveRequest } from "./databases/mongodb.js";
+import {
+  createUserBin,
+  storeRequestToBin,
+  isValidBin,
+  retrieveBinRequests,
+} from "./databases/postgres.js";
 
-mongoose.connect("mongodb://localhost:27017/requestbin");
-
-const requestSchema = new mongoose.Schema({
-  headers: { type: Map, of: String },
-  body: String,
-});
-
-const Request = mongoose.model("Request", requestSchema);
-
-requestSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-function headersParser(req) {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const contentType = req.header("Content-Type");
-  const method = req.method;
-  const accept = req.header("Accept");
-  const body = req.body;
-  const headers = { contentType, method, accept, ip, body };
-  console.debug(headers);
-
-  return headers;
-}
 function binID() {
   return crypto.randomBytes(8).toString("hex");
 }
@@ -39,28 +17,32 @@ function binID() {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-morgan.token("headers", headersParser);
+app.all("/bins/request/:id", async (req, res) => {
+  const binID = req.params["id"];
+  const isValid = await isValidBin(binID)
+  if (!isValid) {
+    res.sendStatus(404);
+  } else {
+    const requestID = await saveRequest(req);
+    const specificHeaders = await storeRequestToBin(req, binID, requestID);
+    console.log(specificHeaders);
 
-app.use(morgan(":headers"));
-
-app.all("/request", async (req, res) => {
-  const headers = req.headers;
-  const body = req.body;
-
-  const newRequest = new Request({
-    headers: headers,
-    body: JSON.stringify(body),
-  });
-
-  const mongoResp = await newRequest.save();
-
-  let id = mongoResp._id.toString();
-
-  res.json(mongoResp);
+    res.sendStatus(200);
+  }
 });
 
 app.get("/", function (req, res) {
   res.send("Hello World");
+});
+
+app.get("/createbin", async (req, res) => {
+  const binID = await createUserBin();
+  res.send("Your bin id is " + binID);
+});
+
+app.get("/bins/:id", async (req, res) => {
+  const binRequests = await retrieveBinRequests(req.params["id"]);
+  res.send(JSON.stringify(binRequests));
 });
 
 const PORT = 3000;
