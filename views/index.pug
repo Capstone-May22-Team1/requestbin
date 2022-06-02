@@ -1,13 +1,20 @@
 
 extends layout
 
+block append head
+  script(src="javascripts/index.js" defer)
+
 block content
   h1 Welcome to Team 1 RequestBin
-
-  p Make your personal request bin 
-  a(href="/createbin")
-    button(type="button") Create Bin
+  .bin-wrapper
+    p.subtitle Make your personal request bin 
+    a(href="/createbin")
+      button.create(type="button") Create Bin
   if binURL
-    p=binURL
+    p#bin-url=binURL
+    button#copyBtn(type="button") Copy URL
+  .requests-wrapper
+    h2 List of requests:
+    block requests
 
   

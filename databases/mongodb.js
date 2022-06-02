@@ -27,7 +27,7 @@ async function saveRequest(req) {
 
   const newRequest = new Request({
     headers: headers,
-    body: JSON.stringify(body),
+    body: JSON.stringify(body, null, 2),
   });
 
   const mongoResp = await newRequest.save();
@@ -41,9 +41,12 @@ async function getPayloads(requestIDs) {
 }
 function payloadsToHash(payloads) {
   const hash = {};
-  payloads.forEach(payload => {
-    hash[payload._id.toString()] = {headers: payload.headers, body: payload.body} 
-  })
+  payloads.forEach((payload) => {
+    hash[payload._id.toString()] = {
+      headers: payload.headers,
+      body: payload.body,
+    };
+  });
   return hash;
 }
 

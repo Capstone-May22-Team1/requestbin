@@ -1,3 +1,63 @@
+.wrapper {
+  padding: 40px;
+  background-color: #002960;
+  color: white;
+}
+
 h1 {
-  color: red;
+  font-size: 48px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+p.subtitle {
+  font-size: 24px;
+}
+
+.bin-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 450px;
+  margin-top: 30px;
+}
+
+.requests-wrapper {
+  background-color: rgb(0, 57, 117);
+  margin-top: 20px;
+  padding: 20px 40px;
+  min-height: 100vh;
+}
+
+button.create {
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: salmon;
+  font-size: 18px;
+}
+
+#bin-url {
+  display: inline-block;
+  padding: 20px;
+  font-size: 20px;
+  color: sandybrown;
+}
+
+li.request {
+  margin-top: 50px;
+  border: 1px solid gray;
+  box-shadow: 0 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 5px 10px;
+}
+
+li.headers {
+  line-height: 1.5rem;
+}
+
+p.header span {
+  font-weight: bold;
+  padding-right: 4px;
 }

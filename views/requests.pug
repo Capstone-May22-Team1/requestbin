@@ -1,11 +1,13 @@
-extends layout
+extends index
 
-block content
+block requests
   ul
     each request in requests
       li.request
         ul
-          for value, header in request.headers
-            li
-              p #{header}: #{value}
-        p=request.body
+          each value, header in request.headers
+            li.headers
+              p.header
+                span #{header}:
+                | #{value}
+        p.body Body: #{request.body};

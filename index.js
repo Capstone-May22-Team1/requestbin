@@ -49,8 +49,7 @@ app.get('/createbin', async (req, res) => {
 
 app.get('/bins/:id', async (req, res) => {
   const requests = await listBinRequests(req.params['id']);
-  console.log(requests);
-  res.render('requests.pug', {requests});
+  res.render('requests.pug', { requests });
 });
 
 function errorHandler(err, req, res, next) {

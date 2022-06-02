@@ -121,21 +121,7 @@ async function retrieveBinRequests(binID) {
     values: [binID],
   };
   const response = await queryHelper(selectRequests);
-  console.log(response.rows);
   return response;
 }
-
-// client.query(createBinTable, (err, res) => {
-//   console.log(err, res);
-// });
-
-// client.query(createRequestTable, (err, res) => {
-//   console.log(err, res);
-// });
-
-// client.query(insertBin, (err, res) => {
-//   console.log(err, res);
-//   client.end();
-// });
 
 export { createUserBin, storeRequestToBin, isValidBin, retrieveBinRequests };
