@@ -1,18 +1,18 @@
-import pg from "pg";
+import pg from 'pg';
 const { Client } = pg;
-import crypto from "crypto";
-const dbName = "requestbin";
+import crypto from 'crypto';
+const dbName = 'requestbin';
 
 const dbInfo = {
-  user: "team1",
-  host: "localhost",
+  user: 'team1',
+  host: 'localhost',
   database: dbName,
-  password: "1234",
+  password: '1234',
   port: 5432,
 };
 
 (function initializeDatabase() {
-  const postgresClient = new Client({ ...dbInfo, database: "postgres" });
+  const postgresClient = new Client({ ...dbInfo, database: 'postgres' });
   const requestBinClient = new Client(dbInfo);
 
   const createBinTable = {
@@ -53,7 +53,7 @@ const dbInfo = {
 })();
 
 function binID() {
-  return crypto.randomBytes(8).toString("hex");
+  return crypto.randomBytes(8).toString('hex');
 }
 
 async function queryHelper(query) {
@@ -81,7 +81,6 @@ async function isValidBin(binID) {
     values: [binID],
   };
   const response = await queryHelper(checkID);
-  console.log(response.rows.length);
   return response.rows.length === 1;
 }
 
@@ -100,10 +99,10 @@ async function storeRequestToBin(req, binID, requestID) {
 }
 
 function headersParser(req) {
-  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const contentType = req.header("Content-Type");
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const contentType = req.header('Content-Type');
   const method = req.method;
-  const accept = req.header("Accept");
+  const accept = req.header('Accept');
   const body = req.body;
   const headers = { contentType, method, accept, ip, body };
   console.debug(headers);
