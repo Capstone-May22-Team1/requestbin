@@ -11,27 +11,20 @@ const dbInfo = {
   port: 5432,
 };
 
-(async function initializeDatabase() {
+(function initializeDatabase() {
   const postgresClient = new Client({ ...dbInfo, database: "postgres" });
   const requestBinClient = new Client(dbInfo);
 
-  try {
-    await postgresClient.connect();
-    // create requestbin database if not exists
-    createDatabaseAndTables();
-  } catch {}
-
-  async function createDatabaseAndTables() {
-    const createBinTable = {
-      text: `CREATE TABLE IF NOT EXISTS bins (
+  const createBinTable = {
+    text: `CREATE TABLE IF NOT EXISTS bins (
     id SERIAL PRIMARY KEY,
     url VARCHAR UNIQUE NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
   );`,
-    };
+  };
 
-    const createRequestTable = {
-      text: `CREATE TABLE IF NOT EXISTS requests (
+  const createRequestTable = {
+    text: `CREATE TABLE IF NOT EXISTS requests (
     id SERIAL PRIMARY KEY,
     bin_url VARCHAR REFERENCES bins (url) NOT NULL,
     accept VARCHAR NOT NULL,
@@ -40,9 +33,13 @@ const dbInfo = {
     request_body_id VARCHAR NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc')
   )`,
-    };
-    const createDatabase = `CREATE DATABASE ${dbName}`;
+  };
+
+  const createDatabase = `CREATE DATABASE ${dbName}`;
+
+  (async function createDatabaseAndTables() {
     try {
+      await postgresClient.connect();
       await postgresClient.query(createDatabase);
       await requestBinClient.connect();
       await requestBinClient.query(createBinTable);
@@ -52,7 +49,7 @@ const dbInfo = {
       postgresClient.end();
       requestBinClient.end();
     }
-  }
+  })();
 })();
 
 function binID() {
