@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 /*
 const ids =  [
@@ -12,14 +12,14 @@ Model.find().where('_id').in(ids).exec((err, records) => {}
 
 */
 
-mongoose.connect("mongodb://localhost:27017/requestbin");
+mongoose.connect('mongodb://localhost:27017/requestbin');
 
 const requestSchema = new mongoose.Schema({
   headers: { type: Map, of: String },
   body: String,
 });
 
-const Request = mongoose.model("Request", requestSchema);
+const Request = mongoose.model('Request', requestSchema);
 
 async function saveRequest(req) {
   const headers = req.headers;
@@ -35,5 +35,16 @@ async function saveRequest(req) {
   return mongoResp._id.toString();
 }
 
-export { saveRequest };
+async function getPayloads(requestIDs) {
+  const payloads = await Request.find({ _id: { $in: requestIDs } }).lean();
+  return payloadsToHash(payloads);
+}
+function payloadsToHash(payloads) {
+  const hash = {};
+  payloads.forEach(payload => {
+    hash[payload._id.toString()] = {headers: payload.headers, body: payload.body} 
+  })
+  return hash;
+}
 
+export { saveRequest, getPayloads };

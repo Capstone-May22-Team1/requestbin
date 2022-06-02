@@ -8,7 +8,15 @@ import {
   storeRequest,
   isValidBin,
   retrieveBinRequests,
+  listBinRequests,
 } from './databases/index.js';
+
+import { getPayloads } from './databases/mongodb.js';
+
+let binURL = '';
+
+app.set('view engine', 'pug');
+app.use(express.static('public'));
 
 function binID() {
   return crypto.randomBytes(8).toString('hex');
@@ -25,22 +33,24 @@ app.all('/bins/request/:id', async (req, res, next) => {
   }
   const specificHeaders = await storeRequest(req, binID);
 
-  console.log(specificHeaders);
   res.sendStatus(200);
 });
 
 app.get('/', function (req, res) {
-  res.send('Hello World');
+  res.render('index.pug', {
+    binURL,
+  });
 });
 
 app.get('/createbin', async (req, res) => {
-  const binID = await createUserBin();
-  res.send('Your bin id is ' + binID);
+  binURL = await createUserBin();
+  res.redirect('/');
 });
 
 app.get('/bins/:id', async (req, res) => {
-  const binRequests = await retrieveBinRequests(req.params['id']);
-  res.send(JSON.stringify(binRequests));
+  const requests = await listBinRequests(req.params['id']);
+  console.log(requests);
+  res.render('requests.pug', {requests});
 });
 
 function errorHandler(err, req, res, next) {

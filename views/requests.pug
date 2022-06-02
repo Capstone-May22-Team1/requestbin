@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  ul
+    each request in requests
+      li.request
+        ul
+          for value, header in request.headers
+            li
+              p #{header}: #{value}
+        p=request.body
