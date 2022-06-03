@@ -8,13 +8,22 @@ block content
   h1 Welcome to Team 1 RequestBin
   .bin-wrapper
     p.subtitle Make your personal request bin 
-    a(href="/createbin")
-      button.create(type="button") Create Bin
-  if binURL
-    p#bin-url=binURL
-    button#copyBtn(type="button") Copy URL
+    //- a(href="/createbin")
+    button#createBtn(type="button") Create Bin
+  //- if binURL
+  p#bin-url(style=`visibility:${binURL ? "visible" : "hidden"}`)=binURL
+  button#copyBtn(type="button" style=`visibility:${binURL ? "visible": "hidden"}`) Copy URL
   .requests-wrapper
     h2 List of requests:
-    block requests
+    ul
+    each request in requests || []
+      li.request
+        ul
+          each value, header in request.headers
+            li.headers
+              p.header
+                span #{header}:
+                | #{value}
+        p.body Body: #{request.body};
 
   

@@ -44,12 +44,12 @@ app.get('/', function (req, res) {
 
 app.get('/createbin', async (req, res) => {
   binURL = await createUserBin();
-  res.redirect('/');
+  res.json({payload: binURL});
 });
 
 app.get('/bins/:id', async (req, res) => {
   const requests = await listBinRequests(req.params['id']);
-  res.render('requests.pug', { requests });
+  res.render('index.pug', { requests });
 });
 
 function errorHandler(err, req, res, next) {
