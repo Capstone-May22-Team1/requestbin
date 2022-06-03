@@ -51,7 +51,8 @@ p.subtitle {
 
 #bin-url {
   display: inline-block;
-  padding: 20px;
+  padding: 40px;
+  padding-left: 0px;
   font-size: 20px;
   color: sandybrown;
 }
@@ -75,4 +76,31 @@ p.header span {
 
 .search-wrapper {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 500px;
+}
+
+#search-bin {
+  font-size: 20px;
+}
+
+#copy-btn {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  background-color: sandybrown;
+}
+
+
+
+#search-bin-btn {
+  display: inline-block;
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 100px;
+  color: white;
+  background-color: #009dc4;
 }

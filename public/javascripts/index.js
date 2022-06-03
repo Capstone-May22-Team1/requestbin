@@ -1,5 +1,5 @@
 const createBtn = document.querySelector('#createBtn');
-const copyBtn = document.querySelector('#copyBtn');
+const copyBtn = document.querySelector('#copy-btn');
 const binURL = document.querySelector('#bin-url');
 const searchBin = document.querySelector('#search-bin');
 const searchBinBtn = document.querySelector('#search-bin-btn');
