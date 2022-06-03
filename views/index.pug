@@ -5,15 +5,16 @@ block append head
   script(src="javascripts/index.js" defer)
 
 block content
-  h1 Welcome to Team 1 RequestBin
-  .bin-wrapper
-    p.subtitle Make your personal request bin 
-    button#createBtn(type="button") Create Bin
-  p#bin-url(style='visibility:hidden')=binURL
-  button#copyBtn(type="button" style='visibility:hidden') Copy URL
-  .search-wrapper
-    input#search-bin(type=text placeholder="Request bin url...")
-    button#search-bin-btn(type="button") Search Request Bin
+  .header-wrapper
+    h1 Welcome to Team 1 RequestBin
+    .bin-wrapper
+      p.subtitle Make your personal request bin 
+      button#createBtn(type="button") Create Bin
+    p#bin-url(style='visibility:hidden')=binURL
+    button#copyBtn(type="button" style='visibility:hidden') Copy URL
+    .search-wrapper
+      input#search-bin(type=text placeholder="Request bin url...")
+      button#search-bin-btn(type="button") Search Request Bin
   .requests-wrapper
     h2 List of requests:
     ul#requests
