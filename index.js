@@ -44,16 +44,18 @@ app.get('/', function (req, res) {
 
 app.get('/createbin', async (req, res) => {
   binURL = await createUserBin();
-  res.json({payload: binURL});
+  res.json({ payload: binURL });
 });
 
 app.get('/bins/:id', async (req, res) => {
   const requests = await listBinRequests(req.params['id']);
-  res.render('index.pug', { requests });
+  // res.render('index.pug', { requests });
+  res.json({ payload: requests });
 });
 
 function errorHandler(err, req, res, next) {
   res.status(404);
+  console.error(err.message);
   res.json({ error: err.message });
 }
 app.use(errorHandler);

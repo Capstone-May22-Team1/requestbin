@@ -61,3 +61,8 @@ p.header span {
   font-weight: bold;
   padding-right: 4px;
 }
+
+
+.search-wrapper {
+  display: flex;
+}
